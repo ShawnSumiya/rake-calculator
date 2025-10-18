@@ -1,0 +1,868 @@
+/* リセットCSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  background: linear-gradient(135deg, #2d1b00 0%, #4a2c00 50%, #6b3d00 100%);
+  background-image: url('./backgroundimage.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  padding: 20px;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 600px;
+  width: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* 画面切り替え */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* ヘッダー */
+header {
+  margin-bottom: 2rem;
+}
+
+h1 {
+  color: #ff8c00;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+/* 統計カード */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1.5rem;
+  border-radius: 15px;
+  border: 2px solid #dee2e6;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card h3 {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ff8c00;
+}
+
+.stat-value.correct {
+  color: #28a745;
+}
+
+/* ボタン */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.primary-btn, .secondary-btn {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: none;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%);
+  color: white;
+}
+
+.primary-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 140, 0, 0.3);
+}
+
+.primary-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.secondary-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.secondary-btn:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* 設定画面 */
+.settings-content {
+  text-align: left;
+  margin: 2rem 0;
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 15px;
+  border: 2px solid #e9ecef;
+}
+
+.setting-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
+
+.setting-section:last-child {
+  margin-bottom: 0;
+}
+
+.setting-section h3 {
+  color: #ff8c00;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.input-group input[type="number"] {
+  padding: 10px 15px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  width: 120px;
+  text-align: center;
+  font-weight: 600;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input[type="number"]:focus {
+  outline: none;
+  border-color: #ff8c00;
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.setting-description {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.radio-option:hover {
+  background-color: #f8f9fa;
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: #ff8c00;
+}
+
+.radio-label {
+  font-weight: 500;
+  color: #333;
+  font-size: 1rem;
+}
+
+.setting-preview {
+  background: linear-gradient(135deg, #fff4e6 0%, #ffe6cc 100%);
+  border: 2px solid #ff8c00;
+}
+
+.preview-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.example {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.example-pot, .example-rake {
+  font-weight: 600;
+  color: #333;
+}
+
+.example-arrow {
+  color: #ff8c00;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* ルール画面 */
+.rules-content {
+  text-align: left;
+  margin: 2rem 0;
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 15px;
+  border: 2px solid #e9ecef;
+}
+
+/* レーキ計算機画面 */
+.calculator-content {
+  text-align: left;
+  margin: 2rem 0;
+}
+
+.calculator-input-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  border: 2px solid #dee2e6;
+  text-align: center;
+}
+
+.calculator-input-section h3 {
+  color: #ff8c00;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.calculator-result-section {
+  background: linear-gradient(135deg, #fff4e6 0%, #ffe6cc 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  border: 2px solid #ff8c00;
+  animation: slideIn 0.5s ease-out;
+}
+
+.calculator-result-section h3 {
+  color: #ff8c00;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.result-display {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  margin-bottom: 1.5rem;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.result-row:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.result-row.highlight {
+  background: linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%);
+  color: white;
+  margin: 1rem -1.5rem 0 -1.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.result-row.highlight .result-label,
+.result-row.highlight .result-value,
+.result-row.highlight .unit {
+  color: white;
+}
+
+.result-label {
+  font-weight: 600;
+  color: #666;
+  font-size: 1rem;
+}
+
+.result-value {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.calculation-explanation {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
+
+.explanation-step {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ff8c00;
+  line-height: 1.6;
+}
+
+.explanation-step:last-of-type {
+  margin-bottom: 1rem;
+}
+
+.explanation-result {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+  border-radius: 8px;
+  border: 2px solid #28a745;
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.highlight-result {
+  color: #28a745;
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rule-section {
+  margin-bottom: 2rem;
+}
+
+.rule-section:last-child {
+  margin-bottom: 0;
+}
+
+.rule-section h3 {
+  color: #ff8c00;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.rule-section p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.rule-section ul {
+  color: #555;
+  padding-left: 1.5rem;
+}
+
+.rule-section li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.rule-section code {
+  background: #e9ecef;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #ff8c00;
+  font-weight: 600;
+}
+
+/* 練習画面 */
+.progress-bar {
+  background: #e9ecef;
+  height: 8px;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 5%;
+}
+
+.progress-text {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.question-container {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  margin: 2rem 0;
+  border: 2px solid #dee2e6;
+}
+
+#question-text {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#pot-input {
+  padding: 18px 25px;
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  width: 180px;
+  text-align: center;
+  font-weight: 600;
+  transition: border-color 0.3s ease;
+  -moz-appearance: textfield;
+}
+
+#pot-input::-webkit-outer-spin-button,
+#pot-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#pot-input:focus {
+  outline: none;
+  border-color: #ff8c00;
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.unit {
+  font-size: 1.2rem;
+  color: #666;
+  font-weight: 600;
+}
+
+/* 結果画面 */
+.result-container {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  margin: 2rem 0;
+  border: 2px solid #dee2e6;
+}
+
+.result-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bounce 0.6s ease-in-out;
+}
+
+.result-icon.correct {
+  color: #28a745;
+}
+
+.result-icon.incorrect {
+  color: #dc3545;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+#result-title {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+#result-title.correct {
+  color: #28a745;
+}
+
+#result-title.incorrect {
+  color: #dc3545;
+}
+
+#result-message {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.answer-details {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: #666;
+}
+
+.detail-row .value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.detail-row .value.correct {
+  color: #28a745;
+}
+
+.detail-row .unit {
+  font-weight: 600;
+  color: #666;
+  margin-left: 0.5rem;
+}
+
+/* 最終結果画面 */
+.final-result-container {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  margin: 2rem 0;
+  border: 2px solid #dee2e6;
+}
+
+.final-result-container h2 {
+  color: #ff8c00;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.final-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.final-stat {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
+
+.final-stat h3 {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.final-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ff8c00;
+}
+
+.final-stat-value.correct {
+  color: #28a745;
+}
+
+.encouragement {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  color: #555;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .buttons {
+    gap: 0.8rem;
+  }
+
+  .primary-btn, .secondary-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+
+  .settings-content {
+    padding: 1.5rem;
+  }
+
+  .setting-section {
+    padding: 1rem;
+  }
+
+  .example {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .rules-content {
+    padding: 1.5rem;
+  }
+
+  .calculator-input-section {
+    padding: 1.5rem;
+  }
+
+  .calculator-result-section {
+    padding: 1.5rem;
+  }
+
+  .result-display {
+    padding: 1rem;
+  }
+
+  .calculation-explanation {
+    padding: 1rem;
+  }
+
+  #question-text {
+    font-size: 1.3rem;
+  }
+
+  #answer-input {
+    width: 120px;
+    padding: 12px 16px;
+    font-size: 1.1rem;
+  }
+
+  #pot-input {
+    width: 150px;
+    padding: 15px 20px;
+    font-size: 1.2rem;
+  }
+
+  .final-stats {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .final-stat {
+    padding: 1rem;
+  }
+
+  .final-stat-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .question-container {
+    padding: 1.5rem;
+  }
+
+  #question-text {
+    font-size: 1.2rem;
+  }
+
+  .result-container {
+    padding: 1.5rem;
+  }
+
+  .result-icon {
+    font-size: 3rem;
+  }
+
+  #result-title {
+    font-size: 1.5rem;
+  }
+
+  #pot-input {
+    width: 130px;
+    padding: 12px 16px;
+    font-size: 1.1rem;
+  }
+
+  .final-result-container {
+    padding: 1.5rem;
+  }
+
+  .final-result-container h2 {
+    font-size: 1.8rem;
+  }
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.screen.active {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* フォーカス時のスタイル */
+.primary-btn:focus,
+.secondary-btn:focus,
+#answer-input:focus {
+  outline: 2px solid #ff8c00;
+  outline-offset: 2px;
+}
+
+/* アクセシビリティ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ダークモード対応（将来の拡張用） */
+@media (prefers-color-scheme: dark) {
+  /* ダークモードのスタイルは必要に応じて追加 */
+}

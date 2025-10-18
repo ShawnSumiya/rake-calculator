@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レーキ計算練習アプリ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>レーキ計算練習</h1>
+    </header>
+
+    <!-- メイン画面 -->
+    <div id="main-screen" class="screen active">
+      <div class="stats">
+        <div class="stat-card">
+          <h3>問題数</h3>
+          <div class="stat-value" id="total-questions">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>正解数</h3>
+          <div class="stat-value correct" id="correct-count">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>正答率</h3>
+          <div class="stat-value" id="accuracy">0%</div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="start-practice-btn" class="primary-btn">練習を開始</button>
+        <button id="show-calculator-btn" class="primary-btn">レーキ計算機</button>
+        <button id="show-settings-btn" class="secondary-btn">設定</button>
+        <button id="show-rules-btn" class="secondary-btn">ルール説明</button>
+      </div>
+    </div>
+
+    <!-- 設定画面 -->
+    <div id="settings-screen" class="screen">
+      <h2>レーキ設定</h2>
+      <div class="settings-content">
+        <div class="setting-section">
+          <h3>レーキ率</h3>
+          <div class="input-group">
+            <input type="number" id="rake-rate" min="1" max="20" step="0.5" value="5">
+            <span class="unit">%</span>
+          </div>
+          <p class="setting-description">ポットに対するレーキの割合</p>
+        </div>
+
+        <!--
+        <div class="setting-section">
+          <h3>切り上げ単位</h3>
+          <div class="input-group">
+            <input type="number" id="rounding-unit" min="1" max="100" value="20">
+            <span class="unit">点</span>
+          </div>
+          <p class="setting-description">※現在は使用されていません（将来の拡張用）</p>
+        </div>
+        -->
+
+        <div class="setting-section">
+          <h3>丸め方法</h3>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="rounding-mode" value="ceil" checked>
+              <span class="radio-label">切り上げ</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="rounding-mode" value="floor">
+              <span class="radio-label">切り捨て</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="rounding-mode" value="round">
+              <span class="radio-label">四捨五入</span>
+            </label>
+          </div>
+          <p class="setting-description">レーキ率計算後の小数点以下の丸め方法を選択</p>
+        </div>
+
+        <div class="setting-section">
+          <h3>最大レーキ</h3>
+          <div class="input-group">
+            <input type="number" id="max-rake" min="1" max="100" value="25">
+            <span class="unit">点</span>
+          </div>
+          <p class="setting-description">レーキの上限値</p>
+        </div>
+
+        <div class="setting-section">
+          <h3>ポットの最大額</h3>
+          <div class="input-group">
+            <input type="number" id="max-pot" min="100" max="10000" value="520">
+            <span class="unit">点</span>
+          </div>
+          <p class="setting-description">練習問題で出題されるポットの最大額</p>
+        </div>
+
+        <div class="setting-preview">
+          <h3>設定プレビュー</h3>
+          <div class="preview-examples">
+            <div class="example">
+              <span class="example-pot">ポット 101点</span>
+              <span class="example-arrow">→</span>
+              <span class="example-rake">レーキ <span id="preview-101">6</span>点</span>
+            </div>
+            <div class="example">
+              <span class="example-pot">ポット 206点</span>
+              <span class="example-arrow">→</span>
+              <span class="example-rake">レーキ <span id="preview-206">11</span>点</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="save-settings-btn" class="primary-btn">設定を保存</button>
+        <button id="reset-settings-btn" class="secondary-btn">デフォルトに戻す</button>
+        <button id="back-to-main-from-settings-btn" class="secondary-btn">メインに戻る</button>
+      </div>
+    </div>
+
+    <!-- ルール説明画面 -->
+    <div id="rules-screen" class="screen">
+      <h2>レーキ計算ルール</h2>
+      <div class="rules-content">
+        <div class="rule-section">
+          <h3>基本ルール</h3>
+          <p id="basic-rule-text">ポットの5%がレーキとして徴収されます（20点刻みで切り上げ）</p>
+        </div>
+        <div class="rule-section">
+          <h3>計算方法</h3>
+          <ul id="calculation-examples">
+            <li>ポットが1-20点 → レーキ1点</li>
+            <li>ポットが21-40点 → レーキ2点</li>
+            <li>ポットが41-60点 → レーキ3点</li>
+            <li>ポットが61-80点 → レーキ4点</li>
+            <li>ポットが81-100点 → レーキ5点</li>
+            <li>...このパターンが続きます</li>
+            <li>ポットが481点以上 → レーキ25点（上限）</li>
+          </ul>
+        </div>
+        <div class="rule-section">
+          <h3>計算式</h3>
+          <p><code id="calculation-formula">レーキ = Math.ceil(ポット ÷ 20)</code></p>
+          <p id="max-rake-note">ただし、481点以上の場合は25点固定</p>
+        </div>
+      </div>
+      <button id="back-to-main-btn" class="primary-btn">メインに戻る</button>
+    </div>
+
+    <!-- 練習画面 -->
+    <div id="practice-screen" class="screen">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+        <span class="progress-text" id="progress-text">問題 1 / 20</span>
+      </div>
+
+      <div class="question-container">
+        <h2 id="question-text">ポット 100 点のレーキは？</h2>
+        <div class="input-container">
+          <input type="number" id="answer-input" placeholder="レーキを入力してください" min="0">
+          <span class="unit">点</span>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="submit-btn" class="primary-btn" disabled>回答する</button>
+        <button id="back-to-main-from-practice-btn" class="secondary-btn">メインに戻る</button>
+      </div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" class="screen">
+      <div class="result-container">
+        <div class="result-icon" id="result-icon">◯</div>
+        <h2 id="result-title">正解！</h2>
+        <p id="result-message">素晴らしいです！</p>
+        
+        <div class="answer-details">
+          <div class="detail-row">
+            <span class="label">ポット:</span>
+            <span class="value" id="pot-value">100</span>
+            <span class="unit">点</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">正解:</span>
+            <span class="value correct" id="correct-answer">5</span>
+            <span class="unit">点</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">あなたの回答:</span>
+            <span class="value" id="user-answer">5</span>
+            <span class="unit">点</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="next-question-btn" class="primary-btn">次の問題</button>
+        <button id="finish-practice-btn" class="secondary-btn">練習を終了</button>
+      </div>
+    </div>
+
+    <!-- レーキ計算機画面 -->
+    <div id="calculator-screen" class="screen">
+      <div class="calculator-content">
+        <div class="calculator-input-section">
+          <h3>ポット額を入力してください</h3>
+          <div class="input-container">
+            <input type="number" id="pot-input" placeholder="ポット額" min="1" max="999999">
+            <span class="unit">点</span>
+          </div>
+          <button id="calculate-rake-btn" class="primary-btn" disabled>レーキを計算</button>
+        </div>
+
+        <div class="calculator-result-section" id="calculator-result" style="display: none;">
+          <h3>計算結果</h3>
+          <div class="result-display">
+            <div class="result-row">
+              <span class="result-label">ポット額:</span>
+              <span class="result-value" id="calc-pot-display">0</span>
+              <span class="unit">点</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">レーキ率:</span>
+              <span class="result-value" id="calc-rate-display">5</span>
+              <span class="unit">%</span>
+            </div>
+            <div class="result-row highlight">
+              <span class="result-label">レーキ:</span>
+              <span class="result-value" id="calc-final-rake">0</span>
+              <span class="unit">点</span>
+            </div>
+          </div>
+          <div class="calculation-explanation" id="calculation-explanation">
+            <!-- 計算過程の説明がここに表示されます -->
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="back-to-main-from-calculator-btn" class="secondary-btn">メインに戻る</button>
+      </div>
+    </div>
+
+    <!-- 最終結果画面 -->
+    <div id="final-result-screen" class="screen">
+      <div class="final-result-container">
+        <h2>練習完了！</h2>
+        <div class="final-stats">
+          <div class="final-stat">
+            <h3>問題数</h3>
+            <div class="final-stat-value" id="final-total">20</div>
+          </div>
+          <div class="final-stat">
+            <h3>正解数</h3>
+            <div class="final-stat-value correct" id="final-correct">15</div>
+          </div>
+          <div class="final-stat">
+            <h3>正答率</h3>
+            <div class="final-stat-value" id="final-accuracy">75%</div>
+          </div>
+        </div>
+        <div class="encouragement" id="encouragement">
+          お疲れ様でした！継続して練習することで、より速く正確に計算できるようになります。
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="restart-btn" class="primary-btn">もう一度練習</button>
+        <button id="back-to-main-final-btn" class="secondary-btn">練習を終了</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
