@@ -9,11 +9,11 @@ class RakeCalculatorApp {
     
     // デフォルト設定
     this.settings = {
-      rakeRate: 5,        // レーキ率（%）
+      rakeRate: 10,        // レーキ率（%）
       roundingUnit: 20,   // 切り上げ単位（点）
       roundingMode: 'ceil', // 丸め方法（ceil/floor/round）
-      maxRake: 25,        // 最大レーキ（点）
-      maxPot: 520         // ポットの最大額（点）
+      maxRake: 50,        // 最大レーキ（点）
+      maxPot: 1000         // ポットの最大額（点）
     };
     
     this.initializeElements();
@@ -353,11 +353,11 @@ class RakeCalculatorApp {
   // 設定のリセット
   resetSettings() {
     this.settings = {
-      rakeRate: 5,
+      rakeRate: 10,
       roundingUnit: 20,
       roundingMode: 'ceil',
-      maxRake: 25,
-      maxPot: 520
+      maxRake: 50,
+      maxPot: 1000
     };
     
     this.updateSettingsUI();
