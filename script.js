@@ -37,6 +37,9 @@ class RakeCalculatorApp {
       finalResult: document.getElementById('final-result-screen')
     };
 
+    // タイトル要素
+    this.titleElement = document.getElementById('main-title');
+
     // 統計要素
     this.statsElements = {
       totalQuestions: document.getElementById('total-questions'),
@@ -167,6 +170,24 @@ class RakeCalculatorApp {
   showScreen(screenId) {
     Object.values(this.screens).forEach(screen => screen.classList.remove('active'));
     this.screens[screenId.replace('-screen', '')].classList.add('active');
+    
+    // タイトルの更新
+    this.updateTitle(screenId);
+  }
+
+  // タイトル更新
+  updateTitle(screenId) {
+    const titles = {
+      'main-screen': 'レーキ計算',
+      'calculator-screen': 'レーキ計算機',
+      'settings-screen': 'レーキ計算 - 設定',
+      'rules-screen': 'レーキ計算 - ルール',
+      'practice-screen': 'レーキ計算 - 練習中',
+      'result-screen': 'レーキ計算 - 結果',
+      'final-result-screen': 'レーキ計算 - 最終結果'
+    };
+    
+    this.titleElement.textContent = titles[screenId] || 'レーキ計算';
   }
 
   // 統計の更新
