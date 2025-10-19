@@ -13,7 +13,8 @@ class RakeCalculatorApp {
       roundingUnit: 20,   // 切り上げ単位（点）
       roundingMode: 'ceil', // 丸め方法（ceil/floor/round）
       maxRake: 50,        // 最大レーキ（点）
-      maxPot: 1000         // ポットの最大額（点）
+      maxPot: 1000,       // ポットの最大額（点）
+      minChip: 1          // 最小チップ額（点）
     };
     
     this.initializeElements();
@@ -77,6 +78,7 @@ class RakeCalculatorApp {
       roundingMode: document.querySelectorAll('input[name="rounding-mode"]'),
       maxRake: document.getElementById('max-rake'),
       maxPot: document.getElementById('max-pot'),
+      minChip: document.getElementById('min-chip'),
       preview101: document.getElementById('preview-101'),
       preview206: document.getElementById('preview-206')
     };
@@ -118,6 +120,7 @@ class RakeCalculatorApp {
     this.settingsElements.rakeRate.addEventListener('input', () => this.updatePreview());
     this.settingsElements.maxRake.addEventListener('input', () => this.updatePreview());
     this.settingsElements.maxPot.addEventListener('input', () => this.updatePreview());
+    this.settingsElements.minChip.addEventListener('input', () => this.updatePreview());
     
     // 丸め方法のラジオボタンのイベント
     this.settingsElements.roundingMode.forEach(radio => {
@@ -219,8 +222,28 @@ class RakeCalculatorApp {
         roundedBasicRake = Math.ceil(basicRake);
     }
     
-    // 最大レーキで制限（切り上げ単位での切り上げは行わない）
-    return Math.min(roundedBasicRake, this.settings.maxRake);
+    // 最小チップ額での調整
+    let adjustedRake = this.adjustToMinChip(roundedBasicRake);
+    
+    // 最大レーキで制限
+    return Math.min(adjustedRake, this.settings.maxRake);
+  }
+
+  // 最小チップ額での調整
+  adjustToMinChip(rake) {
+    const minChip = this.settings.minChip;
+    if (rake < minChip) {
+      return minChip; // 最小チップ額未満は最小チップ額に
+    }
+    
+    // 最小チップ額の倍数に調整
+    const remainder = rake % minChip;
+    if (remainder === 0) {
+      return rake; // 既に最小チップ額の倍数
+    }
+    
+    // 切り上げで調整
+    return Math.ceil(rake / minChip) * minChip;
   }
 
   // 次の問題を表示
@@ -342,7 +365,8 @@ class RakeCalculatorApp {
       roundingUnit: 20, // 固定値（将来の拡張用）
       roundingMode: selectedRoundingMode ? selectedRoundingMode.value : 'ceil',
       maxRake: parseInt(this.settingsElements.maxRake.value),
-      maxPot: parseInt(this.settingsElements.maxPot.value)
+      maxPot: parseInt(this.settingsElements.maxPot.value),
+      minChip: parseInt(this.settingsElements.minChip.value)
     };
     
     localStorage.setItem('rakeCalculatorSettings', JSON.stringify(this.settings));
@@ -357,7 +381,8 @@ class RakeCalculatorApp {
       roundingUnit: 20,
       roundingMode: 'ceil',
       maxRake: 50,
-      maxPot: 1000
+      maxPot: 1000,
+      minChip: 1
     };
     
     this.updateSettingsUI();
@@ -370,6 +395,7 @@ class RakeCalculatorApp {
     // this.settingsElements.roundingUnit.value = this.settings.roundingUnit; // コメントアウト
     this.settingsElements.maxRake.value = this.settings.maxRake;
     this.settingsElements.maxPot.value = this.settings.maxPot;
+    this.settingsElements.minChip.value = this.settings.minChip;
     
     // 丸め方法のラジオボタンを設定
     this.settingsElements.roundingMode.forEach(radio => {
@@ -395,6 +421,7 @@ class RakeCalculatorApp {
     const rakeRate = parseFloat(this.settingsElements.rakeRate.value) || 5;
     const maxRake = parseInt(this.settingsElements.maxRake.value) || 25;
     const maxPot = parseInt(this.settingsElements.maxPot.value) || 520;
+    const minChip = parseInt(this.settingsElements.minChip.value) || 1;
     const selectedRoundingMode = document.querySelector('input[name="rounding-mode"]:checked');
     const roundingMode = selectedRoundingMode ? selectedRoundingMode.value : 'ceil';
     
@@ -416,7 +443,26 @@ class RakeCalculatorApp {
         roundedBasicRake = Math.ceil(basicRake);
     }
     
-    return Math.min(roundedBasicRake, maxRake);
+    // 最小チップ額での調整
+    let adjustedRake = this.adjustToMinChipWithSettings(roundedBasicRake, minChip);
+    
+    return Math.min(adjustedRake, maxRake);
+  }
+
+  // 最小チップ額での調整（プレビュー用）
+  adjustToMinChipWithSettings(rake, minChip) {
+    if (rake < minChip) {
+      return minChip; // 最小チップ額未満は最小チップ額に
+    }
+    
+    // 最小チップ額の倍数に調整
+    const remainder = rake % minChip;
+    if (remainder === 0) {
+      return rake; // 既に最小チップ額の倍数
+    }
+    
+    // 切り上げで調整
+    return Math.ceil(rake / minChip) * minChip;
   }
 
   // 設定画面の表示
@@ -596,3 +642,4 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
