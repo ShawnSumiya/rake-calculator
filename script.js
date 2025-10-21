@@ -429,8 +429,8 @@ class RakeCalculatorApp {
     const rake101 = this.calculateRakeWithSettings(105);
     const rake330 = this.calculateRakeWithSettings(330);
     
-    this.settingsElements.preview101.textContent = rake101;
-    this.settingsElements.preview206.textContent = rake206;
+    this.settingsElements.preview101.textContent = rake105;
+    this.settingsElements.preview206.textContent = rake330;
   }
 
   // 設定値でのレーキ計算（プレビュー用）
