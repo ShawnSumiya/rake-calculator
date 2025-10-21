@@ -427,7 +427,7 @@ class RakeCalculatorApp {
   // プレビューの更新
   updatePreview() {
     const rake101 = this.calculateRakeWithSettings(105);
-    const rake206 = this.calculateRakeWithSettings(220);
+    const rake330 = this.calculateRakeWithSettings(330);
     
     this.settingsElements.preview101.textContent = rake101;
     this.settingsElements.preview206.textContent = rake206;
