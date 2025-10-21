@@ -17,11 +17,37 @@ class RakeCalculatorApp {
       minChip: 1          // 最小チップ額（点）
     };
     
+    // イベントリスナーの管理（メモリリーク防止）
+    this.eventListeners = new Map();
+    
     this.initializeElements();
     this.bindEvents();
     this.loadSettings();
     this.showScreen('main-screen');
     this.updateStats();
+  }
+
+  // イベントリスナー管理のヘルパーメソッド
+  addEventListener(elementId, event, handler) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.addEventListener(event, handler);
+      const key = `${elementId}-${event}`;
+      if (!this.eventListeners.has(key)) {
+        this.eventListeners.set(key, []);
+      }
+      this.eventListeners.get(key).push({ element, event, handler });
+    }
+  }
+
+  // イベントリスナーのクリーンアップ（メモリリーク防止）
+  cleanup() {
+    this.eventListeners.forEach((listeners) => {
+      listeners.forEach(({ element, event, handler }) => {
+        element.removeEventListener(event, handler);
+      });
+    });
+    this.eventListeners.clear();
   }
 
   // DOM要素の初期化
@@ -109,15 +135,15 @@ class RakeCalculatorApp {
   // イベントリスナーの設定
   bindEvents() {
     // メイン画面のボタン
-    document.getElementById('start-practice-btn').addEventListener('click', () => this.startPractice());
-    document.getElementById('show-calculator-btn').addEventListener('click', () => this.showCalculator());
-    document.getElementById('show-settings-btn').addEventListener('click', () => this.showSettings());
-    document.getElementById('show-rules-btn').addEventListener('click', () => this.showRules());
+    this.addEventListener('start-practice-btn', 'click', () => this.startPractice());
+    this.addEventListener('show-calculator-btn', 'click', () => this.showCalculator());
+    this.addEventListener('show-settings-btn', 'click', () => this.showSettings());
+    this.addEventListener('show-rules-btn', 'click', () => this.showRules());
 
     // 設定画面のボタン
-    document.getElementById('save-settings-btn').addEventListener('click', () => this.saveSettings());
-    document.getElementById('reset-settings-btn').addEventListener('click', () => this.resetSettings());
-    document.getElementById('back-to-main-from-settings-btn').addEventListener('click', () => this.showScreen('main-screen'));
+    this.addEventListener('save-settings-btn', 'click', () => this.saveSettings());
+    this.addEventListener('reset-settings-btn', 'click', () => this.resetSettings());
+    this.addEventListener('back-to-main-from-settings-btn', 'click', () => this.showScreen('main-screen'));
 
     // 設定入力フィールドのイベント
     this.settingsElements.rakeRate.addEventListener('input', () => this.updatePreview());
@@ -125,17 +151,23 @@ class RakeCalculatorApp {
     this.settingsElements.maxPot.addEventListener('input', () => this.updatePreview());
     this.settingsElements.minChip.addEventListener('input', () => this.updatePreview());
     
+    // 設定画面の入力フィールドでblurイベントを追加（スマホでの画面拡大防止）
+    this.settingsElements.rakeRate.addEventListener('blur', () => this.settingsElements.rakeRate.blur());
+    this.settingsElements.maxRake.addEventListener('blur', () => this.settingsElements.maxRake.blur());
+    this.settingsElements.maxPot.addEventListener('blur', () => this.settingsElements.maxPot.blur());
+    this.settingsElements.minChip.addEventListener('blur', () => this.settingsElements.minChip.blur());
+    
     // 丸め方法のラジオボタンのイベント
     this.settingsElements.roundingMode.forEach(radio => {
       radio.addEventListener('change', () => this.updatePreview());
     });
 
     // ルール画面のボタン
-    document.getElementById('back-to-main-btn').addEventListener('click', () => this.showScreen('main-screen'));
+    this.addEventListener('back-to-main-btn', 'click', () => this.showScreen('main-screen'));
 
     // レーキ計算機画面のボタン
-    document.getElementById('calculate-rake-btn').addEventListener('click', () => this.calculateRakeForCalculator());
-    document.getElementById('back-to-main-from-calculator-btn').addEventListener('click', () => this.showScreen('main-screen'));
+    this.addEventListener('calculate-rake-btn', 'click', () => this.calculateRakeForCalculator());
+    this.addEventListener('back-to-main-from-calculator-btn', 'click', () => this.showScreen('main-screen'));
 
     // レーキ計算機の入力フィールドイベント
     this.calculatorElements.potInput.addEventListener('input', () => this.validateCalculatorInput());
@@ -146,16 +178,16 @@ class RakeCalculatorApp {
     });
 
     // 練習画面のボタン
-    document.getElementById('submit-btn').addEventListener('click', () => this.submitAnswer());
-    document.getElementById('back-to-main-from-practice-btn').addEventListener('click', () => this.backToMain());
+    this.addEventListener('submit-btn', 'click', () => this.submitAnswer());
+    this.addEventListener('back-to-main-from-practice-btn', 'click', () => this.backToMain());
 
     // 結果画面のボタン
-    document.getElementById('next-question-btn').addEventListener('click', () => this.nextQuestion());
-    document.getElementById('finish-practice-btn').addEventListener('click', () => this.backToMain());
+    this.addEventListener('next-question-btn', 'click', () => this.nextQuestion());
+    this.addEventListener('finish-practice-btn', 'click', () => this.backToMain());
 
     // 最終結果画面のボタン
-    document.getElementById('restart-btn').addEventListener('click', () => this.startPractice());
-    document.getElementById('back-to-main-final-btn').addEventListener('click', () => this.backToMain());
+    this.addEventListener('restart-btn', 'click', () => this.startPractice());
+    this.addEventListener('back-to-main-final-btn', 'click', () => this.backToMain());
 
     // 入力フィールドのイベント
     this.practiceElements.answerInput.addEventListener('input', () => this.validateInput());
@@ -268,15 +300,23 @@ class RakeCalculatorApp {
   // 次の問題を表示
   showNextQuestion() {
     const question = this.questions[this.currentQuestion];
-    this.practiceElements.questionText.textContent = `ポット ${question.pot} 点のレーキは？`;
-    this.practiceElements.answerInput.value = '';
-    this.practiceElements.submitBtn.disabled = true;
-    this.practiceElements.answerInput.focus();
+    
+    // パフォーマンス最適化：DOM操作をバッチ処理
+    requestAnimationFrame(() => {
+      this.practiceElements.questionText.textContent = `ポット ${question.pot} 点のレーキは？`;
+      this.practiceElements.answerInput.value = '';
+      this.practiceElements.submitBtn.disabled = true;
 
-    // 進捗バーの更新
-    const progress = ((this.currentQuestion + 1) / this.totalQuestions) * 100;
-    this.practiceElements.progressFill.style.width = `${progress}%`;
-    this.practiceElements.progressText.textContent = `問題 ${this.currentQuestion + 1} / ${this.totalQuestions}`;
+      // 進捗バーの更新
+      const progress = ((this.currentQuestion + 1) / this.totalQuestions) * 100;
+      this.practiceElements.progressFill.style.width = `${progress}%`;
+      this.practiceElements.progressText.textContent = `問題 ${this.currentQuestion + 1} / ${this.totalQuestions}`;
+      
+      // フォーカスは次のフレームで実行（モバイルでの安定性向上）
+      requestAnimationFrame(() => {
+        this.practiceElements.answerInput.focus();
+      });
+    });
   }
 
   // 入力値の検証
@@ -286,8 +326,16 @@ class RakeCalculatorApp {
     this.practiceElements.submitBtn.disabled = isNaN(value) || value < 0;
   }
 
-  // 回答送信
+  // 回答送信（デバウンス機能付き）
   submitAnswer() {
+    // デバウンス機能：連続クリックを防ぐ
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
+    
+    setTimeout(() => {
+      this.isSubmitting = false;
+    }, 500);
+
     const userAnswer = parseInt(this.practiceElements.answerInput.value);
     const question = this.questions[this.currentQuestion];
     const isCorrect = userAnswer === question.rake;
@@ -296,25 +344,34 @@ class RakeCalculatorApp {
       this.correctAnswers++;
     }
 
+    // スマホでの画面拡大を防ぐため、入力フィールドのフォーカスを解除
+    this.practiceElements.answerInput.blur();
+
     this.showResult(question, userAnswer, isCorrect);
   }
 
   // 結果表示
   showResult(question, userAnswer, isCorrect) {
-    this.resultElements.resultIcon.textContent = isCorrect ? '◯' : '×';
-    this.resultElements.resultIcon.className = `result-icon ${isCorrect ? 'correct' : 'incorrect'}`;
-    this.resultElements.resultTitle.textContent = isCorrect ? '正解！' : '不正解';
-    this.resultElements.resultTitle.className = isCorrect ? 'correct' : 'incorrect';
-    
-    this.resultElements.resultMessage.textContent = isCorrect 
-      ? '素晴らしいです！' 
-      : '頑張りましょう！次は正解できるはずです。';
+    // パフォーマンス最適化：DOM操作をバッチ処理
+    requestAnimationFrame(() => {
+      this.resultElements.resultIcon.textContent = isCorrect ? '◯' : '×';
+      this.resultElements.resultIcon.className = `result-icon ${isCorrect ? 'correct' : 'incorrect'}`;
+      this.resultElements.resultTitle.textContent = isCorrect ? '正解！' : '不正解';
+      this.resultElements.resultTitle.className = isCorrect ? 'correct' : 'incorrect';
+      
+      this.resultElements.resultMessage.textContent = isCorrect 
+        ? '素晴らしいです！' 
+        : '頑張りましょう！次は正解できるはずです。';
 
-    this.resultElements.potValue.textContent = question.pot;
-    this.resultElements.correctAnswer.textContent = question.rake;
-    this.resultElements.userAnswer.textContent = userAnswer;
+      this.resultElements.potValue.textContent = question.pot;
+      this.resultElements.correctAnswer.textContent = question.rake;
+      this.resultElements.userAnswer.textContent = userAnswer;
 
-    this.showScreen('result-screen');
+      // 次のフレームで画面切り替え（DOM操作の分離）
+      requestAnimationFrame(() => {
+        this.showScreen('result-screen');
+      });
+    });
   }
 
   // 次の問題へ
@@ -337,27 +394,30 @@ class RakeCalculatorApp {
 
   // 最終結果の更新
   updateFinalResults() {
-    this.finalResultElements.finalTotal.textContent = this.totalQuestions;
-    this.finalResultElements.finalCorrect.textContent = this.correctAnswers;
-    const accuracy = Math.round((this.correctAnswers / this.totalQuestions) * 100);
-    this.finalResultElements.finalAccuracy.textContent = `${accuracy}%`;
+    // パフォーマンス最適化：DOM操作をバッチ処理
+    requestAnimationFrame(() => {
+      this.finalResultElements.finalTotal.textContent = this.totalQuestions;
+      this.finalResultElements.finalCorrect.textContent = this.correctAnswers;
+      const accuracy = Math.round((this.correctAnswers / this.totalQuestions) * 100);
+      this.finalResultElements.finalAccuracy.textContent = `${accuracy}%`;
 
-    // 励ましメッセージ
-    let encouragement = '';
-    if (accuracy === 100) {
-      encouragement = '完璧です！🎉 あなたはレーキ計算のマスターです！';
-    } else if (accuracy >= 90) {
-      encouragement = '素晴らしい成績です！🌟 ほぼ完璧な計算力を持っています。';
-    } else if (accuracy >= 80) {
-      encouragement = 'とても良い成績です！👏 安定した計算力があります。';
-    } else if (accuracy >= 70) {
-      encouragement = '良い成績です！👍 もう少し練習すれば更に向上します。';
-    } else if (accuracy >= 60) {
-      encouragement = 'まずまずの成績です。💪 継続して練習しましょう。';
-    } else {
-      encouragement = '練習を続けることで必ず上達します！🚀 諦めずに頑張りましょう。';
-    }
-    this.finalResultElements.encouragement.textContent = encouragement;
+      // 励ましメッセージ
+      let encouragement = '';
+      if (accuracy === 100) {
+        encouragement = '完璧です！🎉 あなたはレーキ計算のマスターです！';
+      } else if (accuracy >= 90) {
+        encouragement = '素晴らしい成績です！🌟 ほぼ完璧な計算力を持っています。';
+      } else if (accuracy >= 80) {
+        encouragement = 'とても良い成績です！👏 安定した計算力があります。';
+      } else if (accuracy >= 70) {
+        encouragement = '良い成績です！👍 もう少し練習すれば更に向上します。';
+      } else if (accuracy >= 60) {
+        encouragement = 'まずまずの成績です。💪 継続して練習しましょう。';
+      } else {
+        encouragement = '練習を続けることで必ず上達します！🚀 諦めずに頑張りましょう。';
+      }
+      this.finalResultElements.encouragement.textContent = encouragement;
+    });
   }
 
   // メイン画面に戻る
@@ -589,8 +649,16 @@ class RakeCalculatorApp {
     this.calculatorElements.calculateBtn.disabled = isNaN(value) || value <= 0;
   }
 
-  // レーキ計算機でのレーキ計算
+  // レーキ計算機でのレーキ計算（デバウンス機能付き）
   calculateRakeForCalculator() {
+    // デバウンス機能：連続クリックを防ぐ
+    if (this.isCalculating) return;
+    this.isCalculating = true;
+    
+    setTimeout(() => {
+      this.isCalculating = false;
+    }, 300);
+
     const pot = parseInt(this.calculatorElements.potInput.value);
     if (isNaN(pot) || pot <= 0) return;
 
@@ -598,16 +666,22 @@ class RakeCalculatorApp {
     const basicRake = (pot * this.settings.rakeRate) / 100;
     const finalRake = this.calculateRake(pot);
 
-    // 結果表示の更新
-    this.calculatorElements.potDisplay.textContent = pot;
-    this.calculatorElements.rateDisplay.textContent = this.settings.rakeRate;
-    this.calculatorElements.finalRakeDisplay.textContent = finalRake;
+    // スマホでの画面拡大を防ぐため、入力フィールドのフォーカスを解除
+    this.calculatorElements.potInput.blur();
 
-    // 計算過程の説明を生成
-    this.generateCalculationExplanation(pot, basicRake, finalRake);
+    // パフォーマンス最適化：DOM操作をバッチ処理
+    requestAnimationFrame(() => {
+      // 結果表示の更新
+      this.calculatorElements.potDisplay.textContent = pot;
+      this.calculatorElements.rateDisplay.textContent = this.settings.rakeRate;
+      this.calculatorElements.finalRakeDisplay.textContent = finalRake;
 
-    // 結果セクションを表示
-    this.calculatorElements.resultSection.style.display = 'block';
+      // 計算過程の説明を生成
+      this.generateCalculationExplanation(pot, basicRake, finalRake);
+
+      // 結果セクションを表示
+      this.calculatorElements.resultSection.style.display = 'block';
+    });
   }
 
   // 計算過程の説明を生成
