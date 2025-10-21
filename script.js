@@ -82,7 +82,7 @@ class RakeCalculatorApp {
       maxRake: document.getElementById('max-rake'),
       maxPot: document.getElementById('max-pot'),
       minChip: document.getElementById('min-chip'),
-      preview101: document.getElementById('preview-101'),
+      preview105: document.getElementById('preview-105'),
       preview206: document.getElementById('preview-206')
     };
 
@@ -426,10 +426,10 @@ class RakeCalculatorApp {
 
   // プレビューの更新
   updatePreview() {
-    const rake101 = this.calculateRakeWithSettings(105);
+    const rake105 = this.calculateRakeWithSettings(105);
     const rake330 = this.calculateRakeWithSettings(330);
     
-    this.settingsElements.preview101.textContent = rake105;
+    this.settingsElements.preview105.textContent = rake105;
     this.settingsElements.preview206.textContent = rake330;
   }
 
