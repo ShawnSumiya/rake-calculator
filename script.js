@@ -227,44 +227,42 @@ class RakeCalculatorApp {
     // レーキ率に基づく基本計算（小数点以下を含む）
     const basicRake = (pot * this.settings.rakeRate) / 100;
     
-    // 小数点以下を丸める
-    let roundedBasicRake;
-    switch (this.settings.roundingMode) {
-      case 'ceil':
-        roundedBasicRake = Math.ceil(basicRake);
-        break;
-      case 'floor':
-        roundedBasicRake = Math.floor(basicRake);
-        break;
-      case 'round':
-        roundedBasicRake = Math.round(basicRake);
-        break;
-      default:
-        roundedBasicRake = Math.ceil(basicRake);
-    }
-    
-    // 最小チップ額での調整
-    let adjustedRake = this.adjustToMinChip(roundedBasicRake);
+    // 最小チップ額の単位で丸める
+    let roundedRake = this.roundToMinChip(basicRake);
     
     // 最大レーキで制限
-    return Math.min(adjustedRake, this.settings.maxRake);
+    return Math.min(roundedRake, this.settings.maxRake);
   }
 
-  // 最小チップ額での調整
-  adjustToMinChip(rake) {
+  // 最小チップ額の単位で丸める
+  roundToMinChip(rake) {
     const minChip = this.settings.minChip;
+    
+    // 最小チップ額未満の場合は最小チップ額に
     if (rake < minChip) {
-      return minChip; // 最小チップ額未満は最小チップ額に
+      return minChip;
     }
     
-    // 最小チップ額の倍数に調整
-    const remainder = rake % minChip;
-    if (remainder === 0) {
-      return rake; // 既に最小チップ額の倍数
+    // 最小チップ額での単位に変換
+    const chipUnits = rake / minChip;
+    let roundedUnits;
+    
+    // 設定された丸め方法で処理
+    switch (this.settings.roundingMode) {
+      case 'ceil':
+        roundedUnits = Math.ceil(chipUnits);
+        break;
+      case 'floor':
+        roundedUnits = Math.floor(chipUnits);
+        break;
+      case 'round':
+        roundedUnits = Math.round(chipUnits);
+        break;
+      default:
+        roundedUnits = Math.ceil(chipUnits);
     }
     
-    // 切り上げで調整
-    return Math.ceil(rake / minChip) * minChip;
+    return roundedUnits * minChip;
   }
 
   // 次の問題を表示
@@ -428,8 +426,8 @@ class RakeCalculatorApp {
 
   // プレビューの更新
   updatePreview() {
-    const rake101 = this.calculateRakeWithSettings(101);
-    const rake206 = this.calculateRakeWithSettings(206);
+    const rake101 = this.calculateRakeWithSettings(105);
+    const rake206 = this.calculateRakeWithSettings(220);
     
     this.settingsElements.preview101.textContent = rake101;
     this.settingsElements.preview206.textContent = rake206;
@@ -448,42 +446,39 @@ class RakeCalculatorApp {
     
     const basicRake = (pot * rakeRate) / 100;
     
-    // 小数点以下を丸める
-    let roundedBasicRake;
-    switch (roundingMode) {
-      case 'ceil':
-        roundedBasicRake = Math.ceil(basicRake);
-        break;
-      case 'floor':
-        roundedBasicRake = Math.floor(basicRake);
-        break;
-      case 'round':
-        roundedBasicRake = Math.round(basicRake);
-        break;
-      default:
-        roundedBasicRake = Math.ceil(basicRake);
-    }
+    // 最小チップ額の単位で丸める
+    let roundedRake = this.roundToMinChipWithSettings(basicRake, minChip, roundingMode);
     
-    // 最小チップ額での調整
-    let adjustedRake = this.adjustToMinChipWithSettings(roundedBasicRake, minChip);
-    
-    return Math.min(adjustedRake, maxRake);
+    return Math.min(roundedRake, maxRake);
   }
 
-  // 最小チップ額での調整（プレビュー用）
-  adjustToMinChipWithSettings(rake, minChip) {
+  // 最小チップ額の単位で丸める（プレビュー用）
+  roundToMinChipWithSettings(rake, minChip, roundingMode) {
+    // 最小チップ額未満の場合は最小チップ額に
     if (rake < minChip) {
-      return minChip; // 最小チップ額未満は最小チップ額に
+      return minChip;
     }
     
-    // 最小チップ額の倍数に調整
-    const remainder = rake % minChip;
-    if (remainder === 0) {
-      return rake; // 既に最小チップ額の倍数
+    // 最小チップ額での単位に変換
+    const chipUnits = rake / minChip;
+    let roundedUnits;
+    
+    // 設定された丸め方法で処理
+    switch (roundingMode) {
+      case 'ceil':
+        roundedUnits = Math.ceil(chipUnits);
+        break;
+      case 'floor':
+        roundedUnits = Math.floor(chipUnits);
+        break;
+      case 'round':
+        roundedUnits = Math.round(chipUnits);
+        break;
+      default:
+        roundedUnits = Math.ceil(chipUnits);
     }
     
-    // 切り上げで調整
-    return Math.ceil(rake / minChip) * minChip;
+    return roundedUnits * minChip;
   }
 
   // 設定画面の表示
