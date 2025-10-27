@@ -15,6 +15,7 @@ body {
   background-attachment: fixed;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #333;
@@ -31,6 +32,7 @@ body {
   width: 100%;
   padding: 2rem;
   text-align: center;
+  flex: 1;
 }
 
 /* 画面切り替え */
@@ -906,6 +908,8 @@ h1 {
 
 /* フッター */
 footer {
+  width: 100%;
+  max-width: 600px;
   margin-top: 2rem;
   padding: 1rem;
   text-align: center;
@@ -915,5 +919,13 @@ footer {
 
 footer p {
   margin: 0;
+}
+
+/* レスポンシブ対応 - フッター */
+@media (max-width: 768px) {
+  footer {
+    padding: 0.8rem;
+    font-size: 0.8rem;
+  }
 }
 
