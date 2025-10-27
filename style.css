@@ -904,3 +904,16 @@ h1 {
   /* ダークモードのスタイルは必要に応じて追加 */
 }
 
+/* フッター */
+footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+footer p {
+  margin: 0;
+}
+
